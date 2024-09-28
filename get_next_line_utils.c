@@ -99,16 +99,16 @@ char	*ft_strjoin(char *initial_string, char *buffer_to_add)
 	char	*joint_str;
 	int joint_len;
 /*
-	if (initial_string == NULL)
-		initial_string = "";
 */
 	joint_str = NULL;
-    if (initial_string == NULL)
+  /*
+	if (initial_string == NULL)
 	{
 		joint_len = ft_strlen(buffer_to_add) + 1; 
 		joint_str = (char *)malloc(joint_len * sizeof(char));
 		if (joint_str == NULL)
 			return (NULL);
+
 		while (buffer_to_add[i] != '\0')
 		{
 			joint_str[i] = buffer_to_add[i];
@@ -117,9 +117,12 @@ char	*ft_strjoin(char *initial_string, char *buffer_to_add)
 		joint_str[i] = '\0';
     	return joint_str;
 	}
-	if (initial_string != NULL)
-	{
-		if (initial_string[0] == '\0')
+	*/
+	if (initial_string == NULL || buffer_to_add == NULL)
+		return (NULL);
+	//if (initial_string != NULL)
+//	{
+/*		if (initial_string[0] == '\0')
 		{	joint_len = ft_strlen(buffer_to_add) + 1; 
 		joint_str = (char *)malloc(joint_len * sizeof(char));
 		if (joint_str == NULL)
@@ -134,6 +137,7 @@ char	*ft_strjoin(char *initial_string, char *buffer_to_add)
 		}
 
 	}
+	*/
 	joint_len = ft_strlen(initial_string) + ft_strlen(buffer_to_add) + 1; 
 	joint_str = (char *)malloc(joint_len * sizeof(char));
 	if (joint_str == NULL)
