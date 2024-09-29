@@ -46,12 +46,12 @@ char	*get_next_line(int fd)
 		
 		/*join saved and filled_buffer*/
 		joint_str = ft_strjoin(saved_str, buffer); //join new_string
-		if (joint_str == NULL)
+/*		if (joint_str == NULL)
 		{	
 			free(saved_str);
 			free(buffer);
 			return(NULL);
-		}
+		}*/
 
 		/*update saved_str*/
 		free(saved_str);
@@ -77,51 +77,50 @@ char	*get_next_line(int fd)
 	if (saved_str[i] == '\0')
 		line_to_return =  NULL;
 	else
-	{
+	{		
 		while (saved_str[i] != '\n' && saved_str[i] != '\0')
 			i++;
-		line_to_return = ft_strndup(saved_str, (size_t)i + 1);
-	}
 
-/****PART THREE****/
-//	tmp = update_saved_string_before_return(saved_str);
-
-//	char	*new_saved_string;
-//	int		for_strdup;
-
-	i = 0;
-	while (saved_str[i] != '\n' && saved_str[i] != '\0')
-		i++;
-
-	if (saved_str[i] == '\0')
-	{
-		tmp = (NULL);
-		free(saved_str);
-		the_end = 1;
-	}
-	else
-	{
-		tmp  = ft_strdup(saved_str + i + 1);
-		if (tmp == NULL)
+		if (saved_str[i] == '\n')
 		{
-			free(saved_str);
-			the_end = 1;
-		}
-		else
-		{
+			line_to_return = (char *)malloc((i + 2) * sizeof(char));
+			i = -1;
+			while (saved_str[++i] != '\n')
+				line_to_return[i] = saved_str[i];
+			line_to_return[i] = saved_str[i];
+			i++;
+			line_to_return[i] = '\0';
+
+			i = 0;
+			while (saved_str[i] != '\n')
+				i++;
+			i++; //vai dopo il \n
+			int j = 0;
+			while (saved_str[i + j] != '\0')
+				j++;
+			tmp = (char *)malloc((j + 1) * sizeof(char)); 
+		
+			j = -1;
+			while (saved_str[i + ++j])
+				tmp[j] = saved_str[i + j];
+			tmp[j] = '\0';
+
 			free(saved_str);
 			saved_str = tmp;
 		}
+		else
+		{
+			line_to_return = (char *)malloc((i + 1) * sizeof(char));
+			i = -1;
+			while (saved_str[++i])
+				line_to_return[i] = saved_str[i];
+			line_to_return[i] = '\0';
+			free(saved_str);
+			the_end = 1;
+		}
 	}
 
-
-
 /******************************************/
-	//free(saved_str);
-	//if (tmp != NULL)
-	//	saved_str = tmp;
-	//else
-	//	the_end = 1;
 	return (line_to_return);
 }
 

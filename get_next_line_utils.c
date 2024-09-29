@@ -39,33 +39,10 @@ char	*ft_strdup(const char *s)
 	return (new);
 }
 
-char	*ft_strndup(const char *s, size_t len)
-{
-	size_t	size_malloc;
-	char	*new;
-	char	*initial;
-	size_t	i;
-
-	size_malloc = (len + 1) * sizeof(char);
-	new = malloc(size_malloc);
-	if (new == NULL)
-	{
-		return (NULL);
-	}
-	else
-		initial = new;
-	i = 0;
-	while (i < len)
-	{
-		*new = *s;
-		new++;
-		s++;
-		i++;
-	}
-	*new = '\0';
-	new = initial;
-	return (new);
-}
+/*
+c  i   a    o \n
+1  2   3    4  5
+*/
 
 size_t	ft_strlen(const char *s)
 {
@@ -77,21 +54,7 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
-/*
 
-
-
-c  i  a  o  \0      c  o  m  e  \0
-0  1  2  3  4       0  1  2  3  4
-
-strlen(a) = 4		strlen(b) = 4
-len_joint = 8;
-
-
-c i a o c o m e \0
-0 1 2 3 4 5 6 7 8
-
-*/
 char	*ft_strjoin(char *initial_string, char *buffer_to_add)
 {
 	int		i;
@@ -116,7 +79,6 @@ char	*ft_strjoin(char *initial_string, char *buffer_to_add)
 	j = -1;
 	while (buffer_to_add[++j] != '\0')
 		joint_str[i + j] = buffer_to_add[j];	
-	
 	joint_str[i + j] = '\0';
 
 	return (joint_str);

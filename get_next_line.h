@@ -16,6 +16,6 @@ char	*ft_strchr(const char *s, int c);
 char	*ft_strjoin(char *left_str, char *buff);
 size_t	ft_strlen(const char *s);
 char	*ft_strdup(const char *s);
-char	*ft_strndup(const char *s, size_t len);
+//char	*ft_strndup(char *s, int len);
 
 #endif
