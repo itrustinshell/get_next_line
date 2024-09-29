@@ -16,27 +16,25 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-char	*ft_strdup(const char *s)
+char	*ft_strdup(char *s)
 {
-	size_t	size_malloc;
-	char	*new;
-	char	*initial;
+	int 	i;
+	int		len;
+	char	*str_to_ret;
+	
+	len = ft_strlen(s) + 1;
 
-	size_malloc = (ft_strlen(s) + 1) * sizeof(char);
-	new = malloc(size_malloc);
-	if (new == NULL)
-		return (NULL);
-	else
-		initial = new;
-	while (*s != '\0')
+	str_to_ret = (char *)malloc(len * sizeof(char));
+	
+	i = 0;
+	while (s[i] != '\0')
 	{
-		*new = *s;
-		new++;
-		s++;
+		str_to_ret[i] = s[i];
+		
+		i++;
 	}
-	*new = '\0';
-	new = initial;
-	return (new);
+	str_to_ret[i] = '\0';
+	return (str_to_ret);
 }
 
 /*
@@ -44,7 +42,7 @@ c  i   a    o \n
 1  2   3    4  5
 */
 
-size_t	ft_strlen(const char *s)
+int	ft_strlen(char *s)
 {
 	int		i;
 

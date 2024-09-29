@@ -1,33 +1,89 @@
 #include "get_next_line.h"
 
+/*se entri in questa funzione sai per certo che c'è un nl
+ quindi sono eliminati una serie di controlli specifici
+ questa funzione estrare da una stringa, la sottostringa che termina con \n.
+ aggiunge un null terminator dopo il \n*/
+char *nl_strdup(char *str_to_dup)
+{
+	int i;
+	char *str_to_ret;
+
+	i = 0;
+	while (str_to_dup[i] != '\n')
+		i++;
+	str_to_ret = (char *)malloc((i + 2) * sizeof(char));
+	i = 0;
+	while (str_to_dup[i] != '\n')
+	{
+		str_to_ret[i] = str_to_dup[i];
+		i++;
+	}
+	str_to_ret[i] = str_to_dup[i];
+	i++;
+	str_to_ret[i] = '\0';
+	return str_to_ret;
+}
+
+/*se entri qui sai che c'è un \n*/
+char *str_to_save(char *str_to_inspect)
+{
+	int i;
+	int k;
+	char *str_to_ret;
+
+	i = 0;
+	while (str_to_inspect[i] != '\n')
+		i++;
+	i++; //supero il \n
+	k = 0;
+	while (str_to_inspect[i + k] != '\0')
+		k++;
+	str_to_ret = (char *)malloc((k + 1) * sizeof(char));
+	k = 0;
+	while (str_to_inspect[i + k] != '\0')
+	{
+		str_to_ret[k] = str_to_inspect[i + k];
+		k++;
+	}
+	str_to_ret[k] = '\0';
+	return (str_to_ret);
+}
+
 
 char	*get_next_line(int fd)
 {
-	static char	*saved_str;
+	static char	*static_str;
 	char		*line_to_return;
 	char		*tmp;
 	static int	the_end;
 	/*---reading---*/
-	int read_bytes = 0;
-	char *buffer = NULL;
+	int 		read_bytes;
+	char 		*buffer;
 	/*------*/
-	char	*joint_str = NULL;
-	
+	char	*joint_str_to_copy_in_static;
+	int 	i;
+
+
 /*-----PART ONE-----*/
 	/*---first check ---*/
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	if (the_end == 1)
 		return (NULL);
-
+	/*---first time for static str----*/
+	if (static_str == NULL) //at beginning saved_str is always NULL
+	{
+		static_str = (char *)malloc(1 * sizeof(char));
+		static_str[0] = '\0';
+	}
+		
 	/*---create buffer---*/
 	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (buffer == NULL)
-		return (NULL);
 	
 	/*---while to read up to \n*/
 	read_bytes = 1; //to consent to start while loop
-	while (read_bytes > 0 && ft_strchr(saved_str, '\n') == NULL)
+	while (read_bytes > 0 && ft_strchr(static_str, '\n') == NULL)
 	{
 		/*fill buffer*/
 		read_bytes = read(fd, buffer, BUFFER_SIZE);
@@ -35,35 +91,12 @@ char	*get_next_line(int fd)
 			return(free(buffer), NULL);
 		buffer[read_bytes] = '\0'; //close the buffer
 		
-		/*first time for saved_str*/
-		if (saved_str == NULL) //at beginning saved_str is always NULL
-		{
-			saved_str = (char *)malloc(1 * sizeof(char));
-			if (saved_str == NULL)
-				return (NULL);
-			saved_str[0] = '\0';
-		}
-		
 		/*join saved and filled_buffer*/
-		joint_str = ft_strjoin(saved_str, buffer); //join new_string
-/*		if (joint_str == NULL)
-		{	
-			free(saved_str);
-			free(buffer);
-			return(NULL);
-		}*/
-
-		/*update saved_str*/
-		free(saved_str);
-		saved_str = NULL;
-		saved_str = ft_strdup(joint_str); //update saved string
-		if (saved_str == NULL)
-		{
-			free(buffer);
-			free(joint_str);
-			return (NULL);
-		}
-		free(joint_str);
+		joint_str_to_copy_in_static = ft_strjoin(static_str, buffer); //join new_string	
+		free(static_str);
+		//static_str = ft_strdup(joint_str_to_copy_in_static); //update saved string
+		//free(joint_str_to_copy_in_static);
+		static_str = joint_str_to_copy_in_static;
 	}
 
 	/*---after while free buffer---*/
@@ -71,53 +104,31 @@ char	*get_next_line(int fd)
 
 /*PART TWO*/
 	/*what to return*/
-	int		i;
-	line_to_return = NULL;
 	i = 0;
-	if (saved_str[i] == '\0')
-		line_to_return =  NULL;
-	else
-	{		
-		while (saved_str[i] != '\n' && saved_str[i] != '\0')
-			i++;
-
-		if (saved_str[i] == '\n')
+	while (static_str[i] != '\0' && static_str[i] != '\n')
+		i++;
+	if (static_str[i] == '\0') //significa che siamo alla fine non ci ono \n e stampiamo la rimanenza di static str
+	{
+		if (i == 0) //significa che siamo alla fine e non dobbiamo neanche stampare nnt
 		{
-			line_to_return = (char *)malloc((i + 2) * sizeof(char));
-			i = -1;
-			while (saved_str[++i] != '\n')
-				line_to_return[i] = saved_str[i];
-			line_to_return[i] = saved_str[i];
-			i++;
-			line_to_return[i] = '\0';
-
-			i = 0;
-			while (saved_str[i] != '\n')
-				i++;
-			i++; //vai dopo il \n
-			int j = 0;
-			while (saved_str[i + j] != '\0')
-				j++;
-			tmp = (char *)malloc((j + 1) * sizeof(char)); 
-		
-			j = -1;
-			while (saved_str[i + ++j])
-				tmp[j] = saved_str[i + j];
-			tmp[j] = '\0';
-
-			free(saved_str);
-			saved_str = tmp;
-		}
-		else
-		{
-			line_to_return = (char *)malloc((i + 1) * sizeof(char));
-			i = -1;
-			while (saved_str[++i])
-				line_to_return[i] = saved_str[i];
-			line_to_return[i] = '\0';
-			free(saved_str);
+			free(static_str);
+			static_str = NULL;
 			the_end = 1;
+			return NULL;
 		}
+		line_to_return =  static_str;
+		the_end = 1;
+	}
+	else
+	{
+		//costruisci la stringa da restituire
+		line_to_return = nl_strdup(static_str);
+
+		// costruisci la stringa da salvare
+		tmp = str_to_save(static_str);
+		free(static_str);
+		static_str = NULL;
+		static_str = tmp;
 	}
 
 /******************************************/
@@ -125,6 +136,7 @@ char	*get_next_line(int fd)
 }
 
 /*
+
 int main ()
 {
 	int fd = open("./file.txt", O_RDONLY);
