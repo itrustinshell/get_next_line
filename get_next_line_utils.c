@@ -16,32 +16,6 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-char	*ft_strdup(char *s)
-{
-	int 	i;
-	int		len;
-	char	*str_to_ret;
-	
-	len = ft_strlen(s) + 1;
-
-	str_to_ret = (char *)malloc(len * sizeof(char));
-	
-	i = 0;
-	while (s[i] != '\0')
-	{
-		str_to_ret[i] = s[i];
-		
-		i++;
-	}
-	str_to_ret[i] = '\0';
-	return (str_to_ret);
-}
-
-/*
-c  i   a    o \n
-1  2   3    4  5
-*/
-
 int	ft_strlen(char *s)
 {
 	int		i;

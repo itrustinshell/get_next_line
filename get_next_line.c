@@ -65,45 +65,32 @@ char	*get_next_line(int fd)
 	int 	i;
 
 
-/*-----PART ONE-----*/
+/*-----checks and inizialize-----*/
 	/*---first check ---*/
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	if (the_end == 1)
 		return (NULL);
-	/*---first time for static str----*/
 	if (static_str == NULL) //at beginning saved_str is always NULL
 	{
 		static_str = (char *)malloc(1 * sizeof(char));
 		static_str[0] = '\0';
-	}
-		
-	/*---create buffer---*/
+	}	
 	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	
-	/*---while to read up to \n*/
+/*-------reading---------*/
 	read_bytes = 1; //to consent to start while loop
 	while (read_bytes > 0 && ft_strchr(static_str, '\n') == NULL)
 	{
-		/*fill buffer*/
-		read_bytes = read(fd, buffer, BUFFER_SIZE);
+		read_bytes = read(fd, buffer, BUFFER_SIZE); /*fill buffer*/
 		if (read_bytes < 0) //error
 			return(free(buffer), NULL);
-		buffer[read_bytes] = '\0'; //close the buffer
-		
-		/*join saved and filled_buffer*/
+		buffer[read_bytes] = '\0'; //close the buffer	
 		joint_str_to_copy_in_static = ft_strjoin(static_str, buffer); //join new_string	
 		free(static_str);
-		//static_str = ft_strdup(joint_str_to_copy_in_static); //update saved string
-		//free(joint_str_to_copy_in_static);
 		static_str = joint_str_to_copy_in_static;
 	}
-
-	/*---after while free buffer---*/
 	free(buffer); 
-
-/*PART TWO*/
-	/*what to return*/
+/*PART TWO what to return */
 	i = 0;
 	while (static_str[i] != '\0' && static_str[i] != '\n')
 		i++;
@@ -121,17 +108,12 @@ char	*get_next_line(int fd)
 	}
 	else
 	{
-		//costruisci la stringa da restituire
-		line_to_return = nl_strdup(static_str);
-
-		// costruisci la stringa da salvare
-		tmp = str_to_save(static_str);
+		line_to_return = nl_strdup(static_str);	//costruisci la stringa da restituire
+		tmp = str_to_save(static_str);			// costruisci la stringa da salvare
 		free(static_str);
 		static_str = NULL;
 		static_str = tmp;
 	}
-
-/******************************************/
 	return (line_to_return);
 }
 
