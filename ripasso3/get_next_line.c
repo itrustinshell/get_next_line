@@ -77,6 +77,7 @@ char *ft_strjoin(char *savedstr, char *buffer)
 		len = 0 + ft_strlen(buffer);
 	else
 		len = ft_strlen(savedstr) + ft_strlen(buffer);
+
 	ret = (char *)malloc((len + 1) * sizeof(char));
 
 	if (savedstr == NULL)
@@ -104,38 +105,120 @@ int there_is_nl(char *str)
 	return (0);
 }
 
+/*
+se non c'e'un nl continua a leggere finche' puo', aggiungendo di volta in volta le letture a quelle precedenti.
+
+E'importante ricordare che il buffer di lettura va chiuso con il null terminator dopo i tot caratteri letti.
+
+AAA:
+se la saved ha gia'un nl ?
+ebbene viene ritornata quella saved per poi essere elaborata nell-apposita funzione
+*/
+char *addbuffer_to_savedstr_until_nl_or_eof(int fd, char *savedstr)
+{
+	char	*buffer;
+	int n;
+
+	buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (buffer == NULL)
+	{
+		printf("error: buffer is NULL\n");
+		return NULL;
+	}
+	buffer[BUFFER_SIZE] = '\0';			
+	n = 1;
+	while(n > 0 && !there_is_nl(savedstr))
+	{
+		n = read(fd, buffer, BUFFER_SIZE);
+		if (n < 0)
+		{
+			printf("error: n = %d\n", n);
+			free(buffer);
+			return (NULL);
+		}
+		buffer[n] = '\0';
+		savedstr = ft_strjoin(savedstr, buffer);
+	}
+	return savedstr;	
+}
+
+/*
+questa funzione ritorna una stringa fino a l null terminato a meno che non vi sia un nl.
+in quel caso ritorna un astringa fino al nl
+AAA: bisogna gestire quelche caso speciale ?
+*/
+char *extract_returnstr_from_savedstr(char *savedstr)
+{
+	int i;
+	char *ret;	
+
+	i = 0;
+	
+	while (savedstr[i] && savedstr[i] != '\n')
+		i++;
+	
+	ret = (char *)malloc(i * sizeof(char));
+	
+	i = 0;
+	while (savedstr[i] && savedstr[i] != '\n')
+	{
+		ret[i] = savedstr[i];
+		i++;
+	}
+	ret[i] = '\0';
+//	printf("%s\n", ret);
+	return (ret);
+}
+
+char *delete_extractedstr_from_savedstr(char *savedstr)
+{
+	int i;
+	int j;
+	char *ret;
+	i = 0;
+	while (savedstr[i] && savedstr[i] != '\n')
+		i++;
+	if (savedstr[i] == '\0')
+	{
+		free(savedstr);
+		savedstr = (char *)malloc(sizeof(char));
+		savedstr[0] = '\0';
+	}
+	else
+	{
+		i++; //mi porto dopo li nl
+		while (savedstr[i + j])
+			j++;
+		ret =  (char *)malloc(j * sizeof(char));
+		j =0;
+		while (savedstr[i + j])
+		{
+			ret[j] = savedstr[i + j];
+			j++;
+		}
+		ret[j] = '\0';
+	}
+//	printf("%s\n", ret);
+	return (ret);
+}
 
 char *get_next_line(int fd)
 {
-		int		n;
-		char	*buffer;
-		static char	*savedstr;
+	int	n;
+	char	*buffer;
+	static char	*savedstr;
+	int i;
+	char *returnstr;
 
-		buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
-		if (buffer == NULL)
-		{
-			printf("error: buffer is NULL\n");
-			return NULL;
-		}
-		buffer[BUFFER_SIZE] = '\0';
-		n = 1;
-		while(n > 0 && !there_is_nl(savedstr))
-		{
-			
-			printf("wewewew\n");
-			n = read(fd, buffer, BUFFER_SIZE);
-			if (n < 0)
-			{
-				printf("error: n = %d\n", n);
-				free(buffer);
-				return (NULL);
-			}
-			printf("n: %d\n", n);
-
-			savedstr = ft_strjoin(savedstr, buffer);
-
-		}
-		return savedstr;	
+//	if (savedstr != NULL)
+//		printf("tx: %s\n",savedstr);
+	savedstr = addbuffer_to_savedstr_until_nl_or_eof(fd, savedstr);
+//	printf("GG: %s..\n", savedstr);
+	returnstr = extract_returnstr_from_savedstr(savedstr);
+//	printf("r: %s\n", returnstr);
+	savedstr = delete_extractedstr_from_savedstr(savedstr);
+//	printf("s: %s\n", savedstr);
+	return returnstr;
 }
 
 
@@ -149,13 +232,12 @@ int main(void)
 	int fd = open(path, O_RDONLY);
 
 	str = get_next_line(fd);
-
+//	if (str)
+	//	printf("%s\n", str);
+	str = get_next_line(fd);
+	
 	if (str)
 		printf("%s\n", str);
 	
-
-
-
-
 
 }
