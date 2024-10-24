@@ -70,10 +70,14 @@ char	*get_next_line(int fd)
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	if (the_end == 1)
+	{
 		return (NULL);
+	}
 	if (static_str == NULL) //at beginning saved_str is always NULL
 	{
 		static_str = (char *)malloc(1 * sizeof(char));
+		if (!static_str)
+			return(free(static_str), NULL);
 		static_str[0] = '\0';
 	}	
 	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
@@ -117,7 +121,7 @@ char	*get_next_line(int fd)
 	return (line_to_return);
 }
 
-/*
+
 
 int main ()
 {
@@ -134,4 +138,4 @@ int main ()
 	close(fd);
 	return (0);
 }
-*/
+
